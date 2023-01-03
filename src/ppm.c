@@ -8,6 +8,20 @@ Pixel Pixel_value(int r, int g, int b) {
   return p;
 }
 
+Pixel Pixel_copy(Pixel p) {
+  Pixel q = {
+    .r = p.r,
+    .g = p.g,
+    .b = p.b
+  };
+
+  return q;
+}
+
+void Pixel_print(Pixel p) {
+  printf("(%d, %d, %d)", p.r, p.g, p.b);
+}
+
 int ppm_save_to_file(Pixel *image, int h, int w, char *file_name) {
   FILE *file = fopen(file_name, "w");
 
@@ -23,9 +37,9 @@ int ppm_save_to_file(Pixel *image, int h, int w, char *file_name) {
   // Contents
   for (int row = 0; row < h; row++) {
     for (int col = 0; col < w; col++) {
-      fprintf(file, " %d %d %d ", image[0].r, image[0].g, image[0].b);
+      int idx = row * w + col;
+      fprintf(file, " %d %d %d \n", image[idx].r, image[idx].g, image[idx].b);
     }
-    fprintf(file, "\n");
   }
 
   return fclose(file);

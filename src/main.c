@@ -8,8 +8,8 @@ const char *USAGE = "<usage>";
 
 int main (int argc, char *argv[]) {
   // Setup and CLI argument parsing
-  int image_height = 640;
-  int image_width = 480;
+  int image_height = 480;
+  int image_width = 640;
 
   extern char *optarg;
   int err_flag = 0;
@@ -42,7 +42,12 @@ int main (int argc, char *argv[]) {
   for (int row = 0; row < image_height; row++) {
     for (int col = 0; col < image_width; col++) {
       int this_pixel_idx = row * image_width + col;
-      Pixel px = Pixel_value(0, 0, 0);
+      Pixel px; 
+      if ((col > 100 & col < 300) && (row > 100 && row < 300)) {
+        px = Pixel_value(1, 22, 255);
+      } else {
+        px = Pixel_value(0, 0, 0);
+      }
       img[this_pixel_idx] = px;
     }
   }
