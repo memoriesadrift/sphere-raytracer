@@ -1,26 +1,35 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <unistd.h>
+#include <stdio.h>  // fprintf
+#include <stdlib.h> // free, malloc, EXIT_SUCCESS, EXIT_FAILURE, NULL
+#include <string.h> // memset, strncpy
+#include <unistd.h> // getopt
+#include <getopt.h> // getopt -- on some systems
 
+#include "objects.h"
 #include "ppm.h"
+#include "render.h"
+#include "xml.h"
 
-const char *USAGE = "<usage>";
+#define MAX_FILE_NAME_LEN 255
+
+const char *USAGE = "./raytracer.x -f <input filename>";
 
 int main (int argc, char *argv[]) {
   // Setup and CLI argument parsing
-  int image_height = 480;
-  int image_width = 640;
+  char input_file_name[MAX_FILE_NAME_LEN];
 
   extern char *optarg;
   int err_flag = 0;
   int c;
-  while ((c = getopt(argc, argv, "h:w:")) != -1) {
+  while ((c = getopt(argc, argv, "f:")) != -1) {
     switch (c) {
-      case 'h':
-        image_height = atoi(optarg);
-        break;
-      case 'w':
-        image_width = atoi(optarg);
+      case 'f':
+        if (strlen(optarg) > MAX_FILE_NAME_LEN) {
+          fprintf(stderr, "File name too long, please have your xml files have %d characters at most.\n", MAX_FILE_NAME_LEN); 
+          exit(2);
+        }
+
+        memset(input_file_name, '\0', sizeof(input_file_name));
+        strncpy(input_file_name, optarg, strlen(optarg));
         break;
       case '?':
         err_flag++;
@@ -32,32 +41,46 @@ int main (int argc, char *argv[]) {
     exit(2);
   }
 
-  // Render set up
-  printf("Starting render with glorious C99...\n");
-  int image_size = image_width * image_height;
-  Pixel *img = (Pixel*)malloc(sizeof(Pixel) * image_size); 
+  // File argument parsing
+  printf("Starting XML Parsing...\n");
 
-  printf("%d %d\n", image_height, image_width);
-  // Render loop
-  for (int row = 0; row < image_height; row++) {
-    for (int col = 0; col < image_width; col++) {
-      int this_pixel_idx = row * image_width + col;
-      Pixel px; 
-      if ((col > 100 & col < 300) && (row > 100 && row < 300)) {
-        px = Pixel_value(1, 22, 255);
-      } else {
-        px = Pixel_value(0, 0, 0);
-      }
-      img[this_pixel_idx] = px;
-    }
+  char output_file_name[MAX_FILE_NAME_LEN];
+  int image_height;
+  int image_width;
+  Camera camera;
+  Colour background_colour;
+  Sphere *spheres = NULL;
+  int spheres_size;
+  Light *lights = NULL;
+  int lights_size;
+
+  int xml_parse_result;
+  xml_parse_result = parse_xml_inputs(input_file_name, output_file_name, &image_width, &image_height, &background_colour, &camera, &spheres, &spheres_size, &lights, &lights_size);
+
+  if (xml_parse_result != 0) {
+    return EXIT_FAILURE;
   }
 
+  // Render set up
+  printf("Starting render with glorious C99...\n");
 
-  ppm_save_to_file(img, image_height, image_width, "test.ppm");
-  
+  int image_size = image_width * image_height;
+  Pixel *img = malloc(sizeof(Pixel) * image_size); 
+
+  // Render function
+  render_scene(img, image_width, image_height, background_colour, camera, spheres, spheres_size, lights, lights_size);
+
   printf("Render finished!\n");
 
+  // Save to file
+  printf("Saving to file...\n");
+  ppm_save_to_file(img, image_height, image_width, output_file_name);
+  
+
   // Memory clean up
+  free(spheres);
+  free(lights);
   free(img);
-  return 0;
+
+  return EXIT_SUCCESS;
 }

@@ -1,9 +1,26 @@
+#include <math.h> // sqrt
+
 #include "vector.h"
 
 Vector Vector_value(double x, double y, double z) {
   Vector v = {x, y, z};
 
   return v;
+}
+
+double Vector_magnitude(Vector v) {
+  return sqrt((v.x * v.x) + (v.y * v.y) + (v.z * v.z));
+}
+
+Vector Vector_norm(Vector v) {
+  double m = Vector_magnitude(v);
+  Vector u = {
+    .x = v.x / m,
+    .y = v.y / m,
+    .z = v.z / m
+  };
+
+  return u;
 }
 
 Vector Vector_add(Vector a, Vector b) {
@@ -24,6 +41,10 @@ Vector Vector_sub(Vector a, Vector b) {
   };
 
   return v;
+}
+
+double Vector_dot(Vector a, Vector b) {
+  return a.x * b.x + a.y * b.y + a.z * b.z;
 }
 
 Vector Vector_cross(Vector a, Vector b) {

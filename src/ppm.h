@@ -20,22 +20,6 @@ typedef struct Pixel
 Pixel Pixel_value(int, int, int);
 
 /**
- * Initialises a pixel struct as a copy of the given Pixel.
- *
- * @param Pixel the pixel to copy
- *
- * @returns a Pixel struct initialised with the given Pixel
- */
-Pixel Pixel_copy(Pixel);
-
-/**
- * Prints a pixel using `printf` for debug purposes
- *
- * @param Pixel the pixel to print
- */
-void Pixel_print(Pixel);
-
-/**
  * Function to save the given pixel array to a PPM image
  *
  * @param Pixel* array of pixels to write

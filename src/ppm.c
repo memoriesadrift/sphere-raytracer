@@ -1,25 +1,12 @@
-#include <stdio.h>
+#include <stdio.h> // printf, fprintf, fopen, fclose
 
 #include "ppm.h"
+#include "render.h"
 
 Pixel Pixel_value(int r, int g, int b) {
   Pixel p = {r, g, b};
 
   return p;
-}
-
-Pixel Pixel_copy(Pixel p) {
-  Pixel q = {
-    .r = p.r,
-    .g = p.g,
-    .b = p.b
-  };
-
-  return q;
-}
-
-void Pixel_print(Pixel p) {
-  printf("(%d, %d, %d)", p.r, p.g, p.b);
 }
 
 int ppm_save_to_file(Pixel *image, int h, int w, char *file_name) {
@@ -37,7 +24,7 @@ int ppm_save_to_file(Pixel *image, int h, int w, char *file_name) {
   // Contents
   for (int row = 0; row < h; row++) {
     for (int col = 0; col < w; col++) {
-      int idx = row * w + col;
+      int idx = (h - row) * w + col;
       fprintf(file, " %d %d %d \n", image[idx].r, image[idx].g, image[idx].b);
     }
   }
